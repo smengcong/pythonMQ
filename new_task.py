@@ -8,11 +8,13 @@ channel = connection.channel()
 # channel.queue_declare(queue='hello')
 # 消息持久化注意两点，将"队列"、"消息"设为持久化 durable=True
 channel.queue_declare(queue='task_queue',durable=True)
+#创建一个fanout类型的交换机，命名为logs
+channel.exchange_declare(exchange='logs',type='fanout')
 
 messgae = ' '.join(sys.argv[1:]) or 'hello world!'
-# 通过交换机将信息投递到指定队列
-channel.basic_publish(exchange='',
-                      routing_key='hello',
+# 通过交换机将信息投递到指定队列   现在可以发送消息到上面定义的交换机
+channel.basic_publish(exchange='logs',
+                      routing_key='task_queue',
                       body=messgae,
                       properties=pika.BasicProperties(
                           delivery_mode=2, #让消息持久化
